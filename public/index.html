@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Werewolf</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h3>ゲームに参加ボタン</h3>
+  <button id="entry">参加</button>
+  <h3 id='entryResult'>結果</h3>
+  <script src="/socket.io/socket.io.js"></script>  
+  <script>
+    /* 準備フェーズ **********************/
+    /* ゲームに参加 */
+    let entryState = 'no attempt';
+    // すでに参加した人が一度しか参加ボタンを押せないようにする
+    document.getElementById('entry').addEventListener('click', entryGame);
+    function entryGame() {      
+      if (entryState !== 'no attempt') return;
+      fetch('/entry')
+        .then(res => res.json())
+        .then(data => {             
+          entryState = data.entryResult;
+          const entryOutput = document.getElementById('entryResult');
+
+          if (entryState === 'accepted') {
+            console.log('entry accepted');            
+            entryOutput.innerHTML += ': 参加できました';            
+            initializeSocket(data.room);
+          } else if (entryState === 'denied') {
+            console.log('entry denied');            
+            entryOutput.innerHTML += ': 定員オーバー！あとで参加してください';
+          }
+      });    
+    }
+
+    function initializeSocket(gameRoom) {
+      const socket = io('/'+gameRoom); 
+    }
+
+    /* 昼フェーズ **********************/
+
+    /* 夜フェーズ **********************/
+
+    /* 結果フェーズ **********************/
+
+  </script>
+</body>
+</html>

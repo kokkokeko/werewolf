@@ -10,6 +10,7 @@
   <h3>ゲームに参加ボタン</h3>
   <button id="entry">参加</button>
   <h3 id='entryResult'>結果</h3>
+  <ul id='gameHistory'></ul>
   <script src="/socket.io/socket.io.js"></script>  
   <script>
     /* 準備フェーズ **********************/
@@ -36,12 +37,32 @@
       });    
     }
 
+    const gameHistory = document.getElementById('gameHistory');
+
+    function createHistory(content, nextStep) {
+      // nextStepは次のイベント名
+      const li = document.createElement('li');
+      li.appendChild(document.createTextNode(content));
+
+      const button = document.createElement('button');
+      button.appendChild(document.createTextNode('次へ進む'));
+      button.addEventListener('click', (e) => {
+        socket.emit(nextStep);
+        button.disabled = true;
+      });
+
+      li.appendChild(button);
+      gameHistory.appendChild(li);
+    }
+
+
     function initializeSocket(gameRoom) {
       const socket = io('/'+gameRoom); 
 
       socket.on('preparePhaseGroup', (group) => {
         // あなたのグループはooです
-        console.log(group);
+        const content = 'あなたの役職は'+group+'です';
+        createHistory(content, 'preparePhaseGroupEnd');
       });
 
       /* 昼フェーズ **********************/

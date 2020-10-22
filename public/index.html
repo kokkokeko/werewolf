@@ -38,14 +38,36 @@
 
     function initializeSocket(gameRoom) {
       const socket = io('/'+gameRoom); 
+
+      socket.on('preparePhaseGroup', (group) => {
+        // あなたのグループはooです
+      });
+
+      /* 昼フェーズ **********************/
+      socket.on('dayPhaseDebate', () => {
+        // 話し合う
+      });
+      socket.on('dayPhaseVoting', () => {
+        // 処刑する人を選択
+      });
+      socket.on('dayPhaseLynch', () => {
+        // 処刑結果
+      });
+
+      /* 夜フェーズ **********************/
+      socket.on('nightPhase', () => {
+        // 殺害する人を選んでください
+      });
+      socket.on('dayPhaseKill', () => {
+        // ooが殺害されました
+      });
+
+      /* 結果フェーズ **********************/
+      socket.on('resultPhase', () => {
+        // 残りoo人になりました
+        // ooの勝利
+      });
     }
-
-    /* 昼フェーズ **********************/
-
-    /* 夜フェーズ **********************/
-
-    /* 結果フェーズ **********************/
-
   </script>
 </body>
 </html>

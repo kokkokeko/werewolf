@@ -36,6 +36,11 @@ gameRoom.on('connection', async (socket) => {
   if (playerIds.length === 5) {
     players = await initializeGame(playerIds);
     // preparePhaseGroupイベントへすすむ
+    for (let [id, state] of Object.entries(players)) {
+      console.log(id, state);
+      const group = state.group;
+      gameRoom.to(id).emit('preparePhaseGroup', group);
+    }
   }
 });
 

@@ -55,9 +55,9 @@
       gameHistory.appendChild(li);
     }
 
-
+    let socket;
     function initializeSocket(gameRoom) {
-      const socket = io('/'+gameRoom); 
+      socket = io('/'+gameRoom); 
 
       socket.on('preparePhaseGroup', (group) => {
         // あなたのグループはooです

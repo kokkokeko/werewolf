@@ -50,31 +50,13 @@ module.exports = function (http) {
       }
     });
 
-    socket.on('dayPhaseVotingEnd', (votedId) => {
+    socket.on('dayPhaseVotingEnd', async (votedId) => {
       console.log('dayPhaseVotingEnd: ', votedId);
       voting[votedId]++;
       countDayPhaseVotingEnd++;
       if (countDayPhaseVotingEnd === 5) {      
-        // 集計結果をとる
-        let maxVote = -1;
-        let lynch = [];
-        for (let [id, votesCast] of Object.entries(voting)) {
-          if (maxVote < votesCast) {
-            maxVote = votesCast;
-            lynch = [id];
-          } else if (maxVote === votesCast) {
-            lynch.push(id);
-          }
-        }
-        
-        if (lynch.length === 1) {
-          const id = lynch[0];
-          players[id].isDead = true;
-          gameRoom.emit('dayPhaseLynch', id, voting);
-        } else {
-          gameRoom.emit('dayPhaseLynch', 'nolynch', voting);
-        }
-
+        const person = await decideLynchPerson(voting);
+        gameRoom.emit('dayPhaseLynch', person, voting);
         countDayPhaseVotingEnd = 0;
       }
     });
@@ -85,6 +67,28 @@ module.exports = function (http) {
     
   });
 
+  function decideLynchPerson (voting) {
+    return new Promise ( (resolve, reject) => {
+      // 集計結果をとる
+      let maxVote = -1;
+      let lynch = [];
+      for (let [id, votesCast] of Object.entries(voting)) {
+        if (maxVote < votesCast) {
+          maxVote = votesCast;
+          lynch = [id];
+        } else if (maxVote === votesCast) {
+          lynch.push(id);
+        }
+      }
+
+      if (lynch.length === 1) {
+        const id = lynch[0];
+        players[id].isDead = true;
+        resolve(id);
+      }
+      resolve('nolynch');
+    });
+  }
   function initializeGame(playerIds) {
     return new Promise( (resolve, reject) => {
       // 人狼のidxを決める。

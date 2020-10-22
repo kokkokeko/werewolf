@@ -27,9 +27,13 @@ app.get('/entry', (req, res) => {
   return res.json({entryResult: 'accepted', room: '1001'});
 });
 
+let countPreparePhaseGroupEnd = 0;
+let countDayPhaseDebateEnd = 0;
+
 // 参加者が決まり、通信を始める
 gameRoom.on('connection', async (socket) => {
   console.log('someone connected');
+
   playerIds.push(socket.id);
   // socket.idの例： '/1001#xe_-8ijoihv7DnfgAAAA'
 
@@ -41,6 +45,25 @@ gameRoom.on('connection', async (socket) => {
       gameRoom.to(id).emit('preparePhaseGroup', group, players);
     }
   }
+
+  /* 昼フェーズ **********************/
+  socket.on('preparePhaseGroupEnd', () => {
+    // 昼フェーズをスタートする
+    console.log('preparePhaseGroupEnd');
+    countPreparePhaseGroupEnd++;
+    if (countPreparePhaseGroupEnd === 5) {
+      gameRoom.emit('dayPhaseDebate');
+      countPreparePhaseGroupEnd = 0;
+    }
+  });
+
+  socket.on('dayPhaseDebateEnd', () => {
+    console.log('dayPhaseDebateEnd');
+    countDayPhaseDebateEnd++;
+    if (countDayPhaseDebateEnd === 5) {
+      gameRoom.emit('dayPhaseVoting');
+    }
+  });
 });
 
 function initializeGame(playerIds) {
@@ -63,10 +86,8 @@ function initializeGame(playerIds) {
   });
 }
 
-/* 昼フェーズ **********************/
-  gameRoom.on('preparePhaseGroupEnd', () => {
-    // 昼フェーズをスタートする
-  });
+
+
 
 /* 夜フェーズ **********************/
 

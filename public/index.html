@@ -67,9 +67,11 @@
     }
 
     function renderNextButton(nextStep) {
+      // nextStepは次のイベントを表す
       const button = document.createElement('button');
       button.appendChild(document.createTextNode('次へ進む'));
       button.addEventListener('click', (e) => {
+        console.log('renderNextButton: ', nextStep);
         socket.emit(nextStep);
         button.disabled = true;
       });
@@ -93,9 +95,12 @@
       /* 昼フェーズ **********************/
       socket.on('dayPhaseDebate', () => {
         // 話し合う
+        createHistory('話し合ってください');
+        renderNextButton('dayPhaseDebateEnd');
       });
       socket.on('dayPhaseVoting', () => {
         // 処刑する人を選択
+        console.log('debate');
       });
       socket.on('dayPhaseLynch', () => {
         // 処刑結果

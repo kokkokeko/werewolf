@@ -70,9 +70,7 @@
 
     function renderVoting(players) {
       // 説明文
-      const describe = document.createElement('li');
-      describe.appendChild(document.createTextNode('以下は参加者'));  
-      gameHistory.appendChild(describe);
+      createHistory('以下は参加者');
 
       // radio formを作成
       const form = document.createElement('form');

@@ -37,9 +37,8 @@ gameRoom.on('connection', async (socket) => {
     players = await initializeGame(playerIds);
     // preparePhaseGroupイベントへすすむ
     for (let [id, state] of Object.entries(players)) {
-      console.log(id, state);
       const group = state.group;
-      gameRoom.to(id).emit('preparePhaseGroup', group);
+      gameRoom.to(id).emit('preparePhaseGroup', group, players);
     }
   }
 });
@@ -65,6 +64,9 @@ function initializeGame(playerIds) {
 }
 
 /* 昼フェーズ **********************/
+  gameRoom.on('preparePhaseGroupEnd', () => {
+    // 昼フェーズをスタートする
+  });
 
 /* 夜フェーズ **********************/
 

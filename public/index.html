@@ -39,18 +39,41 @@
 
     const gameHistory = document.getElementById('gameHistory');
 
-    function createHistory(content, nextStep) {
-      // nextStepは次のイベント名
+    function createHistory(content) {
       const li = document.createElement('li');
       li.appendChild(document.createTextNode(content));
+      gameHistory.appendChild(li);
+    }
 
+    function renderPlayers(players) {      
+      const describe = document.createElement('li');
+      describe.appendChild(document.createTextNode('以下は参加者'));
+      gameHistory.appendChild(describe);
+      const form = document.createElement('form');
+      for (let [id, state] of Object.entries(players)) {
+        const radio = document.createElement('input');
+        radio.setAttribute('type', 'radio');
+        radio.setAttribute('name', 'vote');        
+        radio.setAttribute('value', id);        
+        form.appendChild(radio);
+
+        const label = document.createElement('label');
+        label.append(document.createTextNode(id));
+        form.appendChild(label);
+      }
+      const li = document.createElement('li');
+      li.appendChild(form);
+      gameHistory.appendChild(li);
+    }
+
+    function renderNextButton(nextStep) {
       const button = document.createElement('button');
       button.appendChild(document.createTextNode('次へ進む'));
       button.addEventListener('click', (e) => {
         socket.emit(nextStep);
         button.disabled = true;
       });
-
+      const li = document.createElement('li');
       li.appendChild(button);
       gameHistory.appendChild(li);
     }
@@ -59,10 +82,12 @@
     function initializeSocket(gameRoom) {
       socket = io('/'+gameRoom); 
 
-      socket.on('preparePhaseGroup', (group) => {
+      socket.on('preparePhaseGroup', (group, players) => {
         // あなたのグループはooです
         const content = 'あなたの役職は'+group+'です';
-        createHistory(content, 'preparePhaseGroupEnd');
+        createHistory(content);
+        renderPlayers(players);
+        renderNextButton('preparePhaseGroupEnd');
       });
 
       /* 昼フェーズ **********************/

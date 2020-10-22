@@ -46,24 +46,12 @@
     }
 
     function renderPlayers(players) {      
-      const describe = document.createElement('li');
-      describe.appendChild(document.createTextNode('以下は参加者'));
-      gameHistory.appendChild(describe);
+      createHistory('以下は参加者');
       const form = document.createElement('form');
       for (let [id, state] of Object.entries(players)) {
-        const radio = document.createElement('input');
-        radio.setAttribute('type', 'radio');
-        radio.setAttribute('name', 'vote');        
-        radio.setAttribute('value', id);        
-        form.appendChild(radio);
-
-        const label = document.createElement('label');
-        label.append(document.createTextNode(id));
-        form.appendChild(label);
+        const alive = state.isDead === false ? '存命' : '死亡';
+        createHistory(`${id} さん: ${alive}`);
       }
-      const li = document.createElement('li');
-      li.appendChild(form);
-      gameHistory.appendChild(li);
     }
 
     function renderNextButton(nextStep) {

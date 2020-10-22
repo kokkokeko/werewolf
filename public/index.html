@@ -124,6 +124,52 @@
       }
     }
 
+    function renderTarget(players) {
+      // 説明文
+      createHistory('人狼は殺害する人を選んでください。');
+
+      // radio formを作成
+      const form = document.createElement('form');
+      for (let [id, state] of Object.entries(players)) {
+        const radio = document.createElement('input');
+        radio.setAttribute('type', 'radio');
+        radio.setAttribute('name', 'vote');
+        radio.setAttribute('value', id);
+        form.appendChild(radio);
+
+        const label = document.createElement('label');
+        label.append(document.createTextNode(id));
+        form.appendChild(label);
+      }
+
+      if (players[socket.id].group === 'werewolf') {
+        createHistory('あなたは人狼なので殺害する人を選んでください。');
+        // 殺害ボタン
+        const button = document.createElement('button');
+        button.appendChild(document.createTextNode('殺害'));
+        // 殺害者をサーバに送る
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          console.log('renderTarget submit');
+          const data = new FormData(form);
+          for (const entry of data) {
+            socket.emit('nightPhasePickTargetEnd', entry[1]);
+          }
+          button.disabled = true;
+        });
+        form.appendChild(button);
+      }
+
+      // gameHistoryに追加
+      const li = document.createElement('li');
+      li.appendChild(form);
+      gameHistory.appendChild(li);
+
+      if (players[socket.id].group === 'villagers') {
+        createHistory('あなたは村人なので朝になるまでお待ちください');
+      }
+    }
+
     let socket;
     function initializeSocket(gameRoom) {
       socket = io('/'+gameRoom); 
@@ -161,7 +207,7 @@
       socket.on('nightPhasePickTarget', (players) => {
         // 殺害する人を選んでください
         console.log('nightPhasePickTarget');
-
+        renderTarget(players);
       });
       socket.on('dayPhaseKill', () => {
         // ooが殺害されました

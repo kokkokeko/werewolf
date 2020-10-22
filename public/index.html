@@ -148,8 +148,16 @@
         createHistory('処刑する人を選んでください');
         renderVoting(players);
       });
-      socket.on('dayPhaseLynch', () => {
+      socket.on('dayPhaseLynch', (id, voting) => {
         // 処刑結果
+        console.log('dayPhaseLynch');
+        console.log('voting result', voting);
+        console.log('id: ', id);
+        if (id === 'nolynch') {
+          // 処刑されなかった
+        } else {
+          // ooが処刑された
+        }
       });
 
       /* 夜フェーズ **********************/

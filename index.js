@@ -29,6 +29,8 @@ app.get('/entry', (req, res) => {
 
 let countPreparePhaseGroupEnd = 0;
 let countDayPhaseDebateEnd = 0;
+let countDayPhaseVotingEnd = 0;
+const voting = {};
 
 // 参加者が決まり、通信を始める
 gameRoom.on('connection', async (socket) => {
@@ -62,11 +64,39 @@ gameRoom.on('connection', async (socket) => {
     countDayPhaseDebateEnd++;
     if (countDayPhaseDebateEnd === 5) {
       gameRoom.emit('dayPhaseVoting', players);
+      // 投票集計を初期化
+      playerIds.forEach( id => {
+        voting[id] = 0;
+      });
     }
   });
 
-  socket.on('dayPhaseVotingEnd', (voted) => {
-    console.log('dayPhaseVotingEnd: ', voted);
+  socket.on('dayPhaseVotingEnd', (votedId) => {
+    console.log('dayPhaseVotingEnd: ', votedId);
+    voting[votedId]++;
+    countDayPhaseVotingEnd++;
+    if (countDayPhaseVotingEnd === 5) {      
+      // 集計結果をとる
+      let maxVote = -1;
+      let lynch = [];
+      for (let [id, votesCast] of Object.entries(voting)) {
+        if (maxVote < votesCast) {
+          maxVote = votesCast;
+          lynch = [id];
+        } else if (maxVote === votesCast) {
+          lynch.push(id);
+        }
+      }
+      
+      if (lynch.length === 1) {
+        const id = lynch[0];
+        players[id].isDead = true;
+        gameRoom.emit('dayPhaseLynch', id, voting);
+      } else {
+        gameRoom.emit('dayPhaseLynch', 'nolynch', voting);
+      }
+
+    }
   });
   
 });

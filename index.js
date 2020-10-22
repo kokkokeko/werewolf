@@ -16,11 +16,13 @@ const gameRoom = io.of('/1001');
 /* 準備フェーズ **********************/
 const playerIds = [];
 let players;
+let playerCount = 0;
 
 // ゲームに参加するクライアントを決める
 app.get('/entry', (req, res) => {  
+  playerCount++;
   // 五人以上いる場合  
-  if (playerIds.length >= 5) {
+  if (playerCount > 5) {
     return res.json({entryResult: 'denied'});
   }  
   // 五人以下の場合

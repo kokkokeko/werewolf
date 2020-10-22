@@ -80,6 +80,50 @@
       gameHistory.appendChild(li);
     }
 
+    function renderVoting(players) {
+      // 説明文
+      const describe = document.createElement('li');
+      describe.appendChild(document.createTextNode('以下は参加者'));  
+      gameHistory.appendChild(describe);
+
+      // radio formを作成
+      const form = document.createElement('form');
+      for (let [id, state] of Object.entries(players)) {
+        const radio = document.createElement('input');
+        radio.setAttribute('type', 'radio');
+        radio.setAttribute('name', 'vote');
+        radio.setAttribute('value', id);     
+        form.appendChild(radio);
+
+        const label = document.createElement('label');
+        label.append(document.createTextNode(id));
+        form.appendChild(label);
+      }
+
+      // 投票ボタン
+      const button = document.createElement('button');
+      button.appendChild(document.createTextNode('投票'));
+
+      // 投票をサーバに送る
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        console.log('renderVoting submit');
+        console.log(form);
+        console.log(new FormData(form));
+        const data = new FormData(form);
+        for (const entry of data) {
+          socket.emit('dayPhaseVotingEnd', entry[1]);
+        }
+        button.disabled = true;
+      });
+  
+      // gameHistoryに追加
+      form.appendChild(button);
+      const li = document.createElement('li');
+      li.appendChild(form);
+      gameHistory.appendChild(li);
+    }
+
     let socket;
     function initializeSocket(gameRoom) {
       socket = io('/'+gameRoom); 
@@ -98,9 +142,11 @@
         createHistory('話し合ってください');
         renderNextButton('dayPhaseDebateEnd');
       });
-      socket.on('dayPhaseVoting', () => {
+      socket.on('dayPhaseVoting', (players) => {
         // 処刑する人を選択
-        console.log('debate');
+        console.log('dayPhaseVoting');
+        createHistory('処刑する人を選んでください');
+        renderVoting(players);
       });
       socket.on('dayPhaseLynch', () => {
         // 処刑結果

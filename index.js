@@ -61,9 +61,14 @@ gameRoom.on('connection', async (socket) => {
     console.log('dayPhaseDebateEnd');
     countDayPhaseDebateEnd++;
     if (countDayPhaseDebateEnd === 5) {
-      gameRoom.emit('dayPhaseVoting');
+      gameRoom.emit('dayPhaseVoting', players);
     }
   });
+
+  socket.on('dayPhaseVotingEnd', (voted) => {
+    console.log('dayPhaseVotingEnd: ', voted);
+  });
+  
 });
 
 function initializeGame(playerIds) {

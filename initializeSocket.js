@@ -7,6 +7,7 @@ module.exports = function (http) {
   let countPreparePhaseGroupEnd = 0;
   let countDayPhaseDebateEnd = 0;
   let countDayPhaseVotingEnd = 0;
+  let countDayPhaseLynchEnd = 0;
   const voting = {};
 
   // 参加者が決まり、通信を始める
@@ -62,7 +63,18 @@ module.exports = function (http) {
     });
 
     /* 夜フェーズ **********************/
+    socket.on('dayPhaseLynchEnd', () => {
+      console.log('dayPhaseLynchEnd');
+      countDayPhaseLynchEnd++;
+      if (countDayPhaseLynchEnd === 5) {
+        gameRoom.emit('nightPhasePickTarget', players);
+        countDayPhaseLynchEnd = 0;
+      }
+    });
 
+    socket.on('nightPhasePickTargetEnd', () => {
+      console.log('nightPhasePickTargetEnd');
+    });
     /* 結果フェーズ **********************/
     
   });

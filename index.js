@@ -28,31 +28,35 @@ app.get('/entry', (req, res) => {
 });
 
 // 参加者が決まり、通信を始める
-gameRoom.on('connection', socket => {
+gameRoom.on('connection', async (socket) => {
   console.log('someone connected');
   playerIds.push(socket.id);
   // socket.idの例： '/1001#xe_-8ijoihv7DnfgAAAA'
 
   if (playerIds.length === 5) {
-    players = initializeGame(playerIds);
+    players = await initializeGame(playerIds);
+    // preparePhaseGroupイベントへすすむ
   }
 });
 
 function initializeGame(playerIds) {
-  // 人狼のidxを決める。
-  const werewolf = Math.floor(Math.random() * (4 + 1) );
-  // player情報
-  const players = {};
+  return new Promise( (resolve, reject) => {
+    // 人狼のidxを決める。
+    const werewolf = Math.floor(Math.random() * (4 + 1) );
+    // player情報
+    const players = {};
 
-  playerIds.forEach( (id, idx) => {
-    players[id] = {};    
-    players[id].group = idx === werewolf
-      ? 'werewolf'
-      : 'villagers';
-    players[id].isDead = false;
+    playerIds.forEach( (id, idx) => {
+      players[id] = {};
+
+      players[id].group = idx === werewolf
+        ? 'werewolf'
+        : 'villagers';
+      players[id].isDead = false;
+    });
+
+    resolve(players);
   });
-
-  return players;
 }
 
 /* 昼フェーズ **********************/

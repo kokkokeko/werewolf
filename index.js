@@ -64,6 +64,7 @@ gameRoom.on('connection', async (socket) => {
     countDayPhaseDebateEnd++;
     if (countDayPhaseDebateEnd === 5) {
       gameRoom.emit('dayPhaseVoting', players);
+      countDayPhaseDebateEnd = 0;
       // 投票集計を初期化
       playerIds.forEach( id => {
         voting[id] = 0;
@@ -96,6 +97,7 @@ gameRoom.on('connection', async (socket) => {
         gameRoom.emit('dayPhaseLynch', 'nolynch', voting);
       }
 
+      countDayPhaseVotingEnd = 0;
     }
   });
   

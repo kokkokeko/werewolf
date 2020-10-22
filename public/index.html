@@ -124,6 +124,20 @@
       gameHistory.appendChild(li);
     }
 
+    function renderVotingResult(voting, id) {
+      createHistory('結果は以下の通りです');
+      for (let [id, count] of Object.entries(voting)) {
+        createHistory(`${id} さんは${count}票`);
+      }
+      if (id === 'nolynch') {
+        // 処刑されなかった
+        createHistory('同数票がいるため処刑は行われませんでした');
+      } else {
+        // ooが処刑された
+        createHistory('投票の結果、'+id+' さんが処刑されました');
+      }
+    }
+
     let socket;
     function initializeSocket(gameRoom) {
       socket = io('/'+gameRoom); 
@@ -153,16 +167,15 @@
         console.log('dayPhaseLynch');
         console.log('voting result', voting);
         console.log('id: ', id);
-        if (id === 'nolynch') {
-          // 処刑されなかった
-        } else {
-          // ooが処刑された
-        }
+        renderVotingResult(voting, id);
+        renderNextButton('dayPhaseLynchEnd');
       });
 
       /* 夜フェーズ **********************/
-      socket.on('nightPhase', () => {
+      socket.on('nightPhasePickTarget', (players) => {
         // 殺害する人を選んでください
+        console.log('nightPhasePickTarget');
+
       });
       socket.on('dayPhaseKill', () => {
         // ooが殺害されました

@@ -35,7 +35,7 @@ function renderPlayers(players) {
   const form = document.createElement('form');
   for (let [id, state] of Object.entries(players)) {
     const alive = state.isDead === false ? '存命' : '死亡';
-    createHistory(`${id} さん: ${alive}`);
+    createHistory(`${state.name} さん: ${alive}`);
   }
 }
 
@@ -69,8 +69,9 @@ function renderVoting(players) {
     }
     form.appendChild(radio);
 
+    const player = state.name;
     const label = document.createElement('label');
-    label.append(document.createTextNode(id));
+    label.append(document.createTextNode(player));
     form.appendChild(label);
   }
 
@@ -101,17 +102,17 @@ function renderVoting(players) {
   gameHistory.appendChild(li);
 }
 
-function renderVotingResult(voting, id) {
+function renderVotingResult(voting, id, players) {
   createHistory('結果は以下の通りです');
   for (let [id, count] of Object.entries(voting)) {
-    createHistory(`${id} さんは${count}票`);
+    createHistory(`${players[id].name} さんは${count}票`);
   }
   if (id === 'nolynch') {
     // 処刑されなかった
     createHistory('同数票がいるため処刑は行われませんでした');
   } else {
     // ooが処刑された
-    createHistory('投票の結果、'+id+' さんが処刑されました');
+    createHistory('投票の結果、'+players[id].name+' さんが処刑されました');
   }
 }
 
@@ -132,7 +133,7 @@ function renderTarget(players) {
     form.appendChild(radio);
 
     const label = document.createElement('label');
-    label.append(document.createTextNode(id));
+    label.append(document.createTextNode(players[id].name));
     form.appendChild(label);
   }
 
@@ -164,8 +165,8 @@ function renderTarget(players) {
   }
 }
 
-function renderKillResult (id) {
-  createHistory(id+' さんが殺害されました。');
+function renderKillResult (name) {
+  createHistory(name+' さんが殺害されました。');
 }
 
 function renderNameForm () {
@@ -222,7 +223,7 @@ function initializeSocket(gameRoom) {
     console.log('dayPhaseLynch');
     console.log('voting result', voting);
     console.log('id: ', id);
-    renderVotingResult(voting, id);
+    renderVotingResult(voting, id, players);
     renderPlayers(players);
     if (winner === 'werewolf') {
       createHistory('人狼の勝利！！');
@@ -245,7 +246,7 @@ function initializeSocket(gameRoom) {
   socket.on('dayPhaseKill', (killed, players, winner) => {
     // ooが殺害されました
     console.log('dayPhaseKill');
-    renderKillResult(killed);
+    renderKillResult(players[killed].name);
     renderPlayers(players);
     if (winner === 'werewolf') {
       createHistory('人狼の勝利！！');

@@ -11,6 +11,7 @@ module.exports = function (http) {
   let countDayPhaseKillEnd = 0;
   let totalAlive = 5;
   const voting = {};
+  let werewolfId;
 
   // 参加者が決まり、通信を始める
   gameRoom.on('connection', async (socket) => {
@@ -60,7 +61,14 @@ module.exports = function (http) {
       if (countDayPhaseVotingEnd === totalAlive) {
         const person = await decideLynchPerson(voting);
         totalAlive--;
-        gameRoom.emit('dayPhaseLynch', person, voting, players);
+        let winner = 'no terminate';
+        if (players[werewolfId].isDead === true) {
+          winner = 'villagers';
+        } else if (totalAlive === 2) {
+          winner = 'werewolf';
+        }
+
+        gameRoom.emit('dayPhaseLynch', person, voting, players, winner);
         countDayPhaseVotingEnd = 0;
       }
     });
@@ -79,7 +87,11 @@ module.exports = function (http) {
       console.log('nightPhasePickTargetEnd');
       players[killId].isDead = true;
       totalAlive--;
-      gameRoom.emit('dayPhaseKill', killId, players);
+      let winner = 'no terminate';
+      if (totalAlive === 2) {
+        winner = 'werewolf';
+      }
+      gameRoom.emit('dayPhaseKill', killId, players, winner);
     });
 
     socket.on('dayPhaseKillEnd', () => {
@@ -126,9 +138,12 @@ module.exports = function (http) {
       playerIds.forEach( (id, idx) => {
         players[id] = {};
 
-        players[id].group = idx === werewolf
-          ? 'werewolf'
-          : 'villagers';
+        if (idx === werewolf) {
+          players[id].group = 'werewolf';
+          werewolfId = id;
+        } else {
+          players[id].group = 'villagers';
+        }
         players[id].isDead = false;
       });
 

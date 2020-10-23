@@ -196,13 +196,20 @@ function initializeSocket(gameRoom) {
     createHistory('処刑する人を選んでください');
     renderVoting(players);
   });
-  socket.on('dayPhaseLynch', (id, voting, players) => {
+  socket.on('dayPhaseLynch', (id, voting, players, winner) => {
     // 処刑結果
     console.log('dayPhaseLynch');
     console.log('voting result', voting);
     console.log('id: ', id);
     renderVotingResult(voting, id);
     renderPlayers(players);
+    if (winner === 'werewolf') {
+      createHistory('人狼の勝利！！');
+      return;
+    } else if (winner === 'villagers') {
+      createHistory('村人の勝利！！');
+      return;
+    }
     if (players[socket.id].isDead === false) {
       renderNextButton('dayPhaseLynchEnd');
     }
@@ -214,11 +221,15 @@ function initializeSocket(gameRoom) {
     console.log('nightPhasePickTarget');
     renderTarget(players);
   });
-  socket.on('dayPhaseKill', (killed, players) => {
+  socket.on('dayPhaseKill', (killed, players, winner) => {
     // ooが殺害されました
     console.log('dayPhaseKill');
     renderKillResult(killed);
     renderPlayers(players);
+    if (winner === 'werewolf') {
+      createHistory('人狼の勝利！！');
+      return;
+    }
     if (players[socket.id].isDead === false) {
       renderNextButton('dayPhaseKillEnd');
     }

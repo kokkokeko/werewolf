@@ -9,6 +9,7 @@ module.exports = function (http) {
   let countDayPhaseVotingEnd = 0;
   let countDayPhaseLynchEnd = 0;
   let countDayPhaseKillEnd = 0;
+  let totalAlive = 5;
   const voting = {};
 
   // 参加者が決まり、通信を始める
@@ -33,8 +34,8 @@ module.exports = function (http) {
       // 昼フェーズをスタートする
       console.log('preparePhaseGroupEnd');
       countPreparePhaseGroupEnd++;
-      if (countPreparePhaseGroupEnd === 5) {
-        gameRoom.emit('dayPhaseDebate');
+      if (countPreparePhaseGroupEnd === totalAlive) {
+        gameRoom.emit('dayPhaseDebate', players);
         countPreparePhaseGroupEnd = 0;
       }
     });
@@ -42,7 +43,7 @@ module.exports = function (http) {
     socket.on('dayPhaseDebateEnd', () => {
       console.log('dayPhaseDebateEnd');
       countDayPhaseDebateEnd++;
-      if (countDayPhaseDebateEnd === 5) {
+      if (countDayPhaseDebateEnd === totalAlive) {
         gameRoom.emit('dayPhaseVoting', players);
         countDayPhaseDebateEnd = 0;
         // 投票集計を初期化
@@ -56,8 +57,9 @@ module.exports = function (http) {
       console.log('dayPhaseVotingEnd: ', votedId);
       voting[votedId]++;
       countDayPhaseVotingEnd++;
-      if (countDayPhaseVotingEnd === 5) {      
+      if (countDayPhaseVotingEnd === totalAlive) {
         const person = await decideLynchPerson(voting);
+        totalAlive--;
         gameRoom.emit('dayPhaseLynch', person, voting, players);
         countDayPhaseVotingEnd = 0;
       }
@@ -67,7 +69,7 @@ module.exports = function (http) {
     socket.on('dayPhaseLynchEnd', () => {
       console.log('dayPhaseLynchEnd');
       countDayPhaseLynchEnd++;
-      if (countDayPhaseLynchEnd === 5) {
+      if (countDayPhaseLynchEnd === totalAlive) {
         gameRoom.emit('nightPhasePickTarget', players);
         countDayPhaseLynchEnd = 0;
       }
@@ -76,14 +78,15 @@ module.exports = function (http) {
     socket.on('nightPhasePickTargetEnd', (killId) => {
       console.log('nightPhasePickTargetEnd');
       players[killId].isDead = true;
+      totalAlive--;
       gameRoom.emit('dayPhaseKill', killId, players);
     });
 
     socket.on('dayPhaseKillEnd', () => {
       console.log('dayPhaseKillEnd');
       countDayPhaseKillEnd++
-      if (countDayPhaseKillEnd === 5) {
-        gameRoom.emit('dayPhaseDebate');
+      if (countDayPhaseKillEnd === totalAlive) {
+        gameRoom.emit('dayPhaseDebate', players);
         countDayPhaseKillEnd = 0;
       }
     });

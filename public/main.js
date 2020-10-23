@@ -74,25 +74,28 @@ function renderVoting(players) {
     form.appendChild(label);
   }
 
-  // 投票ボタン
-  const button = document.createElement('button');
-  button.appendChild(document.createTextNode('投票'));
+  if (players[socket.id].isDead === false) {
+    // 投票ボタン
+    const button = document.createElement('button');
+    button.appendChild(document.createTextNode('投票'));
 
-  // 投票をサーバに送る
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    console.log('renderVoting submit');
-    console.log(form);
-    console.log(new FormData(form));
-    const data = new FormData(form);
-    for (const entry of data) {
-      socket.emit('dayPhaseVotingEnd', entry[1]);
-    }
-    button.disabled = true;
-  });
+    // 投票をサーバに送る
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      console.log('renderVoting submit');
+      console.log(form);
+      console.log(new FormData(form));
+      const data = new FormData(form);
+      for (const entry of data) {
+        socket.emit('dayPhaseVotingEnd', entry[1]);
+      }
+      button.disabled = true;
+    });
+
+    form.appendChild(button);
+  }
 
   // gameHistoryに追加
-  form.appendChild(button);
   const li = document.createElement('li');
   li.appendChild(form);
   gameHistory.appendChild(li);
@@ -174,14 +177,18 @@ function initializeSocket(gameRoom) {
     const content = 'あなたの役職は'+group+'です';
     createHistory(content);
     renderPlayers(players);
-    renderNextButton('preparePhaseGroupEnd');
+    if (players[socket.id].isDead === false) {
+      renderNextButton('preparePhaseGroupEnd');
+    }
   });
 
   /* 昼フェーズ **********************/
-  socket.on('dayPhaseDebate', () => {
+  socket.on('dayPhaseDebate', (players) => {
     // 話し合う
     createHistory('話し合ってください');
-    renderNextButton('dayPhaseDebateEnd');
+    if (players[socket.id].isDead === false) {
+      renderNextButton('dayPhaseDebateEnd');
+    }
   });
   socket.on('dayPhaseVoting', (players) => {
     // 処刑する人を選択
@@ -196,7 +203,9 @@ function initializeSocket(gameRoom) {
     console.log('id: ', id);
     renderVotingResult(voting, id);
     renderPlayers(players);
-    renderNextButton('dayPhaseLynchEnd');
+    if (players[socket.id].isDead === false) {
+      renderNextButton('dayPhaseLynchEnd');
+    }
   });
 
   /* 夜フェーズ **********************/
@@ -210,7 +219,9 @@ function initializeSocket(gameRoom) {
     console.log('dayPhaseKill');
     renderKillResult(killed);
     renderPlayers(players);
-    renderNextButton('dayPhaseKillEnd');
+    if (players[socket.id].isDead === false) {
+      renderNextButton('dayPhaseKillEnd');
+    }
   });
 
   /* 結果フェーズ **********************/

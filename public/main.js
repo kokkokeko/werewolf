@@ -86,8 +86,6 @@ function renderVoting(players) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       console.log('renderVoting submit');
-      console.log(form);
-      console.log(new FormData(form));
       const data = new FormData(form);
       for (const entry of data) {
         socket.emit('dayPhaseVotingEnd', entry[1]);
@@ -283,12 +281,6 @@ function initializeSocket(gameRoom) {
     if (players[socket.id].isDead === false) {
       renderNextButton('dayPhaseKillEnd');
     }
-  });
-
-  /* 結果フェーズ **********************/
-  socket.on('resultPhase', () => {
-    // 残りoo人になりました
-    // ooの勝利
   });
 
   /* 誰かがゲームを抜けた場合*****************************/

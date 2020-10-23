@@ -126,8 +126,6 @@ module.exports = function (http) {
         countDayPhaseKillEnd = 0;
       }
     });
-    /* 結果フェーズ **********************/
-    
   });
 
   function decideLynchPerson (voting) {

@@ -206,9 +206,13 @@ function renderNameForm () {
   form.appendChild(button);
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    console.log('Name submit');
-    const name = input.value;
-    socket.emit('submitPlayerName', name);
+    if (input.value.length === 0) {
+      alert('名前を入力してください');
+    } else {
+      console.log('Name submit');
+      const name = input.value;
+      socket.emit('submitPlayerName', name);
+    }
   });
 
   gameHistory.appendChild(form);

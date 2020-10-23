@@ -307,4 +307,9 @@ function initializeSocket(gameRoom) {
   socket.on('someoneDisconnect', () => {
     alert('誰かがゲームから外れました！これ以上ゲームを進めることができません');
   });
+
+  /* 参加が拒否された場合*************************/
+  socket.on('deniedByLimitation', () => {
+    alert('定員オーバー！あとで参加してください');
+  });
 }

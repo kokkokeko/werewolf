@@ -45,6 +45,8 @@ module.exports = function (http) {
           const group = state.group;
           gameRoom.to(id).emit('preparePhaseGroup', group, players);
         }
+      } else if (countPlayer > 5) {
+        gameRoom.to(socket.id).emit('deniedByLimitation');
       }
     });
 

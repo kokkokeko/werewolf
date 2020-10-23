@@ -60,7 +60,9 @@ module.exports = function (http) {
       countDayPhaseVotingEnd++;
       if (countDayPhaseVotingEnd === totalAlive) {
         const person = await decideLynchPerson(voting);
-        totalAlive--;
+        if (person !== 'nolynch') {
+          totalAlive--;
+        }
         let winner = 'no terminate';
         if (players[werewolfId].isDead === true) {
           winner = 'villagers';

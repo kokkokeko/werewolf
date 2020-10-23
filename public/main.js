@@ -159,12 +159,23 @@ function renderTarget(players) {
     // 殺害者をサーバに送る
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      console.log('renderTarget submit');
-      const data = new FormData(form);
-      for (const entry of data) {
-        socket.emit('nightPhasePickTargetEnd', entry[1]);
+      let atLeastChecked = false;
+      for (let child of form.children) { // childにはlabelも含まれるが気にしない
+        if (child.checked === true) {
+          atLeastChecked = true;
+          break;
+        }
       }
-      button.disabled = true;
+      if (atLeastChecked !== true) {
+        alert('少なくとも一人選んでください');
+      } else {
+        console.log('renderTarget submit');
+        const data = new FormData(form);
+        for (const entry of data) {
+          socket.emit('nightPhasePickTargetEnd', entry[1]);
+        }
+        button.disabled = true;
+      }
     });
     form.appendChild(button);
   }

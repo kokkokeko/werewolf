@@ -1,25 +1,13 @@
 /* 準備フェーズ **********************/
 /* ゲームに参加 */
-let entryState = 'no attempt';
-// すでに参加した人が一度しか参加ボタンを押せないようにする
 document.getElementById('entry').addEventListener('click', entryGame);
-function entryGame() {      
-  if (entryState !== 'no attempt') return;
+function entryGame(e) {
+  e.target.disabled = true;
   fetch('/entry')
     .then(res => res.json())
-    .then(data => {             
-      entryState = data.entryResult;
-      const entryOutput = document.getElementById('entryResult');
-
-      if (entryState === 'accepted') {
-        console.log('entry accepted');            
-        entryOutput.innerHTML += ': 参加できました';            
-        initializeSocket(data.room);
-      } else if (entryState === 'denied') {
-        console.log('entry denied');            
-        entryOutput.innerHTML += ': 定員オーバー！あとで参加してください';
-      }
-  });    
+    .then(data => {
+      initializeSocket(data.room);
+  });
 }
 
 const gameHistory = document.getElementById('gameHistory');

@@ -17,17 +17,10 @@ const initializeSocket = require('./initializeSocket.js');
 initializeSocket(http);
 
 /* 準備フェーズ **********************/
-let playerCount = 0;
 
-// ゲームに参加するクライアントを決める
+// socket通信に使う情報を送る
 app.get('/entry', (req, res) => {  
-  playerCount++;
-  // 五人以上いる場合  
-  //if (playerCount > 5) {
-  //  return res.json({entryResult: 'denied'});
-  //}
-  // 五人以下の場合
-  return res.json({entryResult: 'accepted', room: '1001'});
+  return res.json({room: '1001'});
 });
 
 http.listen( process.env.PORT || 3000, () => {

@@ -170,6 +170,10 @@
       }
     }
 
+    function renderKillResult (id) {
+      createHistory(id+' さんが殺害されました。');
+    }
+
     let socket;
     function initializeSocket(gameRoom) {
       socket = io('/'+gameRoom); 
@@ -209,8 +213,11 @@
         console.log('nightPhasePickTarget');
         renderTarget(players);
       });
-      socket.on('dayPhaseKill', () => {
+      socket.on('dayPhaseKill', (killed) => {
         // ooが殺害されました
+        console.log('dayPhaseKill');
+        renderKillResult(killed);
+        renderNextButton('dayPhaseKillEnd');
       });
 
       /* 結果フェーズ **********************/

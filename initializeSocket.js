@@ -58,7 +58,7 @@ module.exports = function (http) {
       countDayPhaseVotingEnd++;
       if (countDayPhaseVotingEnd === 5) {      
         const person = await decideLynchPerson(voting);
-        gameRoom.emit('dayPhaseLynch', person, voting);
+        gameRoom.emit('dayPhaseLynch', person, voting, players);
         countDayPhaseVotingEnd = 0;
       }
     });
@@ -76,7 +76,7 @@ module.exports = function (http) {
     socket.on('nightPhasePickTargetEnd', (killId) => {
       console.log('nightPhasePickTargetEnd');
       players[killId].isDead = true;
-      gameRoom.emit('dayPhaseKill', killId);
+      gameRoom.emit('dayPhaseKill', killId, players);
     });
 
     socket.on('dayPhaseKillEnd', () => {

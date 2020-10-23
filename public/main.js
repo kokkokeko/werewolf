@@ -31,7 +31,7 @@ function createHistory(content) {
 }
 
 function renderPlayers(players) {      
-  createHistory('以下は参加者');
+  createHistory('以下は現在の生存者です');
   const form = document.createElement('form');
   for (let [id, state] of Object.entries(players)) {
     const alive = state.isDead === false ? '存命' : '死亡';
@@ -189,12 +189,13 @@ function initializeSocket(gameRoom) {
     createHistory('処刑する人を選んでください');
     renderVoting(players);
   });
-  socket.on('dayPhaseLynch', (id, voting) => {
+  socket.on('dayPhaseLynch', (id, voting, players) => {
     // 処刑結果
     console.log('dayPhaseLynch');
     console.log('voting result', voting);
     console.log('id: ', id);
     renderVotingResult(voting, id);
+    renderPlayers(players);
     renderNextButton('dayPhaseLynchEnd');
   });
 
@@ -204,10 +205,11 @@ function initializeSocket(gameRoom) {
     console.log('nightPhasePickTarget');
     renderTarget(players);
   });
-  socket.on('dayPhaseKill', (killed) => {
+  socket.on('dayPhaseKill', (killed, players) => {
     // ooが殺害されました
     console.log('dayPhaseKill');
     renderKillResult(killed);
+    renderPlayers(players);
     renderNextButton('dayPhaseKillEnd');
   });
 

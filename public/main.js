@@ -302,4 +302,9 @@ function initializeSocket(gameRoom) {
     // 残りoo人になりました
     // ooの勝利
   });
+
+  /* 誰かがゲームを抜けた場合*****************************/
+  socket.on('someoneDisconnect', () => {
+    alert('誰かがゲームから外れました！これ以上ゲームを進めることができません');
+  });
 }

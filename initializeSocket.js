@@ -18,6 +18,11 @@ module.exports = function (http) {
     /* 準備フェーズ **********************/
     console.log('someone connected');
 
+    socket.on('disconnect', () => {
+      // 誰かが退出するとゲームを終了する
+      gameRoom.emit('someoneDisconnect');
+    });
+
     socket.on('submitPlayerName', async (name) => {
       console.log('submitPlayerName');
       playerNames.push([socket.id, name]);

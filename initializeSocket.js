@@ -2,6 +2,7 @@ module.exports = function (http) {
   const io = require('socket.io')(http);
   const gameRoom = io.of('/1001');
 
+  let countPlayer;
   let playerNames;
   let players;
   let countPreparePhaseGroupEnd;
@@ -20,23 +21,30 @@ module.exports = function (http) {
     console.log('someone connected');
 
     socket.on('disconnect', () => {
-      // 誰かが退出するとゲームを終了する
-      gameRoom.emit('someoneDisconnect');
-      resetGlobalVariable();
+      for (let [id, ] of playerNames) {
+        if (id === socket.id) {
+        // 参加者の誰かが退出するとゲームを終了する
+          gameRoom.emit('someoneDisconnect');
+          resetGlobalVariable();
+        }
+      }
     });
 
     socket.on('submitPlayerName', async (name) => {
       console.log('submitPlayerName');
-      playerNames.push([socket.id, name]);
-      // socket.idの例： '/1001#xe_-8ijoihv7DnfgAAAA'
+      countPlayer++;
+      if (countPlayer <= 5) {
+        playerNames.push([socket.id, name]);
+        // socket.idの例： '/1001#xe_-8ijoihv7DnfgAAAA'
+      }
 
-      if (playerNames.length === 5) {
+      if (countPlayer === 5) {
         players = await initializeGame(playerNames);
         // preparePhaseGroupイベントへすすむ
         for (let [id, state] of Object.entries(players)) {
           const group = state.group;
           gameRoom.to(id).emit('preparePhaseGroup', group, players);
-        }        
+        }
       }
     });
 
@@ -166,8 +174,9 @@ module.exports = function (http) {
     });
   }
   function resetGlobalVariable() {
+    countPlayer = 0;
     playerNames = [];
-    players = undefined;
+    players = {};
     countPreparePhaseGroupEnd = 0;
     countDayPhaseDebateEnd = 0;
     countDayPhaseVotingEnd = 0;

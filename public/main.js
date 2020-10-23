@@ -168,9 +168,30 @@ function renderKillResult (id) {
   createHistory(id+' さんが殺害されました。');
 }
 
+function renderNameForm () {
+  createHistory('ゲームで使用する名前を入力してください');
+  const form = document.createElement('form');
+  const input = document.createElement('input');
+  input.setAttribute('type', 'text');
+  form.appendChild(input);
+
+  const button = document.createElement('button');
+  button.appendChild(document.createTextNode('送信する'));
+  form.appendChild(button);
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    console.log('Name submit');
+    const name = input.value;
+    socket.emit('submitPlayerName', name);
+  });
+
+  gameHistory.appendChild(form);
+}
+
 let socket;
 function initializeSocket(gameRoom) {
-  socket = io('/'+gameRoom); 
+  socket = io('/'+gameRoom);
+  renderNameForm();
 
   socket.on('preparePhaseGroup', (group, players) => {
     // あなたのグループはooです

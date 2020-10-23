@@ -2,7 +2,7 @@ module.exports = function (http) {
   const io = require('socket.io')(http);
   const gameRoom = io.of('/1001');
 
-  const playerIds = [];
+  const playerNames = [];
   let players;
   let countPreparePhaseGroupEnd = 0;
   let countDayPhaseDebateEnd = 0;
@@ -18,17 +18,20 @@ module.exports = function (http) {
     /* 準備フェーズ **********************/
     console.log('someone connected');
 
-    playerIds.push(socket.id);
-    // socket.idの例： '/1001#xe_-8ijoihv7DnfgAAAA'
+    socket.on('submitPlayerName', async (name) => {
+      console.log('submitPlayerName');
+      playerNames.push([socket.id, name]);
+      // socket.idの例： '/1001#xe_-8ijoihv7DnfgAAAA'
 
-    if (playerIds.length === 5) {
-      players = await initializeGame(playerIds);
-      // preparePhaseGroupイベントへすすむ
-      for (let [id, state] of Object.entries(players)) {
-        const group = state.group;
-        gameRoom.to(id).emit('preparePhaseGroup', group, players);
+      if (playerNames.length === 5) {
+        players = await initializeGame(playerNames);
+        // preparePhaseGroupイベントへすすむ
+        for (let [id, state] of Object.entries(players)) {
+          const group = state.group;
+          gameRoom.to(id).emit('preparePhaseGroup', group, players);
+        }        
       }
-    }
+    });
 
     /* 昼フェーズ **********************/
     socket.on('preparePhaseGroupEnd', () => {
@@ -130,14 +133,14 @@ module.exports = function (http) {
       resolve('nolynch');
     });
   }
-  function initializeGame(playerIds) {
+  function initializeGame(playerNames) {
     return new Promise( (resolve, reject) => {
       // 人狼のidxを決める。
       const werewolf = Math.floor(Math.random() * (4 + 1) );
       // player情報
       const players = {};
 
-      playerIds.forEach( (id, idx) => {
+      playerNames.forEach( ([id, name], idx) => {
         players[id] = {};
 
         if (idx === werewolf) {
@@ -146,6 +149,7 @@ module.exports = function (http) {
         } else {
           players[id].group = 'villagers';
         }
+        players[id].name = name;
         players[id].isDead = false;
       });
 

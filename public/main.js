@@ -212,6 +212,7 @@ function renderNameForm () {
       console.log('Name submit');
       const name = input.value;
       socket.emit('submitPlayerName', name);
+      button.disabled = true;
     }
   });
 

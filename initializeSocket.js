@@ -8,6 +8,7 @@ module.exports = function (http) {
   let countDayPhaseDebateEnd = 0;
   let countDayPhaseVotingEnd = 0;
   let countDayPhaseLynchEnd = 0;
+  let countDayPhaseKillEnd = 0;
   const voting = {};
 
   // 参加者が決まり、通信を始める
@@ -72,8 +73,19 @@ module.exports = function (http) {
       }
     });
 
-    socket.on('nightPhasePickTargetEnd', () => {
+    socket.on('nightPhasePickTargetEnd', (killId) => {
       console.log('nightPhasePickTargetEnd');
+      players[killId].isDead = true;
+      gameRoom.emit('dayPhaseKill', killId);
+    });
+
+    socket.on('dayPhaseKillEnd', () => {
+      console.log('dayPhaseKillEnd');
+      countDayPhaseKillEnd++
+      if (countDayPhaseKillEnd === 5) {
+        gameRoom.emit('dayPhaseDebate');
+        countDayPhaseKillEnd = 0;
+      }
     });
     /* 結果フェーズ **********************/
     

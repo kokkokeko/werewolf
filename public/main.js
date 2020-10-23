@@ -63,7 +63,10 @@ function renderVoting(players) {
     const radio = document.createElement('input');
     radio.setAttribute('type', 'radio');
     radio.setAttribute('name', 'vote');
-    radio.setAttribute('value', id);     
+    radio.setAttribute('value', id);
+    if (socket.id === id || state.isDead === true) {
+      radio.disabled = true;
+    }
     form.appendChild(radio);
 
     const label = document.createElement('label');
@@ -120,6 +123,9 @@ function renderTarget(players) {
     radio.setAttribute('type', 'radio');
     radio.setAttribute('name', 'vote');
     radio.setAttribute('value', id);
+    if (socket.id === id || state.isDead === true) {
+      radio.disabled = true;
+    }
     form.appendChild(radio);
 
     const label = document.createElement('label');

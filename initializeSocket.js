@@ -51,7 +51,7 @@ module.exports = function (http) {
         gameRoom.emit('dayPhaseVoting', players);
         countDayPhaseDebateEnd = 0;
         // 投票集計を初期化
-        playerIds.forEach( id => {
+        playerNames.forEach( ([id, name]) => {
           voting[id] = 0;
         });
       }

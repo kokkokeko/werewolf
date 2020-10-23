@@ -213,7 +213,14 @@ function renderNameForm () {
 
   gameHistory.appendChild(form);
 }
-
+function renderGameEnd(players) {
+  createHistory('役職の詳細');
+  const form = document.createElement('form');
+  for (let [id, state] of Object.entries(players)) {
+    const alive = state.isDead === false ? '存命' : '死亡';
+    createHistory(`${state.name} さん: ${state.group} ${alive}`);
+  }
+};
 let socket;
 function initializeSocket(gameRoom) {
   socket = io('/'+gameRoom);
@@ -252,9 +259,11 @@ function initializeSocket(gameRoom) {
     renderPlayers(players);
     if (winner === 'werewolf') {
       createHistory('人狼の勝利！！');
+      renderGameEnd(players);
       return;
     } else if (winner === 'villagers') {
       createHistory('村人の勝利！！');
+      renderGameEnd(players);
       return;
     }
     if (players[socket.id].isDead === false) {
@@ -275,6 +284,7 @@ function initializeSocket(gameRoom) {
     renderPlayers(players);
     if (winner === 'werewolf') {
       createHistory('人狼の勝利！！');
+      renderGameEnd(players);
       return;
     }
     if (players[socket.id].isDead === false) {

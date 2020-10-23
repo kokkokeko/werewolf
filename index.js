@@ -23,9 +23,9 @@ let playerCount = 0;
 app.get('/entry', (req, res) => {  
   playerCount++;
   // 五人以上いる場合  
-  if (playerCount > 5) {
-    return res.json({entryResult: 'denied'});
-  }  
+  //if (playerCount > 5) {
+  //  return res.json({entryResult: 'denied'});
+  //}
   // 五人以下の場合
   return res.json({entryResult: 'accepted', room: '1001'});
 });

@@ -183,7 +183,7 @@ function renderKillResult (name) {
 }
 
 function renderNameForm () {
-  createHistory('ゲームで使用する名前を入力してください');
+  createHistory('ゲームで使用する名前を入力してください（ゲームにはまだ参加していません！');
   const form = document.createElement('form');
   const input = document.createElement('input');
   input.setAttribute('type', 'text');

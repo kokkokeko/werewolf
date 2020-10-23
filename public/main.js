@@ -59,6 +59,19 @@ function renderVoting(players) {
 
   // radio formを作成
   const form = document.createElement('form');
+
+  // 誰も選ばない場合のラジオボタン。デフォルトでチェックされる
+  const radioNoSelect = document.createElement('input');
+  radioNoSelect.setAttribute('type', 'radio');
+  radioNoSelect.setAttribute('name', 'vote');
+  radioNoSelect.setAttribute('value', 'noselect');
+  radioNoSelect.checked = true;
+  form.appendChild(radioNoSelect);
+
+  const label = document.createElement('label');
+  label.append(document.createTextNode('誰も選ばない'));
+  form.appendChild(label);
+
   for (let [id, state] of Object.entries(players)) {
     const radio = document.createElement('input');
     radio.setAttribute('type', 'radio');
@@ -74,6 +87,7 @@ function renderVoting(players) {
     label.append(document.createTextNode(player));
     form.appendChild(label);
   }
+
 
   if (players[socket.id].isDead === false) {
     // 投票ボタン

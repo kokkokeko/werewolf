@@ -59,7 +59,9 @@ module.exports = function (http) {
 
     socket.on('dayPhaseVotingEnd', async (votedId) => {
       console.log('dayPhaseVotingEnd: ', votedId);
-      voting[votedId]++;
+      if (votedId !== 'noselect') {
+        voting[votedId]++;
+      }
       countDayPhaseVotingEnd++;
       if (countDayPhaseVotingEnd === totalAlive) {
         const person = await decideLynchPerson(voting);

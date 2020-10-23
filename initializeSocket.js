@@ -2,16 +2,17 @@ module.exports = function (http) {
   const io = require('socket.io')(http);
   const gameRoom = io.of('/1001');
 
-  const playerNames = [];
+  let playerNames;
   let players;
-  let countPreparePhaseGroupEnd = 0;
-  let countDayPhaseDebateEnd = 0;
-  let countDayPhaseVotingEnd = 0;
-  let countDayPhaseLynchEnd = 0;
-  let countDayPhaseKillEnd = 0;
-  let totalAlive = 5;
-  const voting = {};
+  let countPreparePhaseGroupEnd;
+  let countDayPhaseDebateEnd;
+  let countDayPhaseVotingEnd;
+  let countDayPhaseLynchEnd;
+  let countDayPhaseKillEnd;
+  let totalAlive;
+  let voting;
   let werewolfId;
+  resetGlobalVariable();
 
   // 参加者が決まり、通信を始める
   gameRoom.on('connection', async (socket) => {
@@ -21,6 +22,7 @@ module.exports = function (http) {
     socket.on('disconnect', () => {
       // 誰かが退出するとゲームを終了する
       gameRoom.emit('someoneDisconnect');
+      resetGlobalVariable();
     });
 
     socket.on('submitPlayerName', async (name) => {
@@ -162,6 +164,18 @@ module.exports = function (http) {
 
       resolve(players);
     });
+  }
+  function resetGlobalVariable() {
+    playerNames = [];
+    players = undefined;
+    countPreparePhaseGroupEnd = 0;
+    countDayPhaseDebateEnd = 0;
+    countDayPhaseVotingEnd = 0;
+    countDayPhaseLynchEnd = 0;
+    countDayPhaseKillEnd = 0;
+    totalAlive = 5;
+    voting = {};
+    werewolfId = undefined;
   }
 
 }
